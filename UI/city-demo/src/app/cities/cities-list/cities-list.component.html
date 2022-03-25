@@ -1,0 +1,141 @@
+<div class="container">
+  <div *ngIf="errorMsg" class="alert alert-warning alert-dismissible fade show notification-padding" role="alert">
+    {{errorMsg}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
+      (click)="clearErrorNotification()"></button>
+  </div>
+
+  <div *ngIf="successMsg" class="alert alert-info alert-dismissible fade show notification-padding" role="alert">
+    {{successMsg}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
+      (click)="clearSuccessNotification()"></button>
+  </div>
+
+  <div class="search-bar-bottom">
+    <nav class="navbar navbar-light bg-light">
+      <div class="form-inline" style="display: flex;width: 100%;">
+
+        <input class="form-control mr-sm-6" type="text" placeholder="search by city name..." [(ngModel)]="searchText"
+          aria-label="Search">
+        <button class="btn btn-outline-success my-2 my-sm-0 btn-margin" (click)="searchCity()">Search</button>
+        <button class="btn btn-outline-success my-2 my-sm-0 btn-margin" (click)="clearSearch()">Clear</button>
+
+      </div>
+    </nav>
+  </div>
+
+  <div class="card">
+    <div class="row div-margin-5px">
+      <h5>Cities</h5>
+    </div>
+    <div *ngIf="citiesModel" class="mat-elevation-z8 ">
+      <mat-progress-bar mode="indeterminate" *ngIf="isLoading"></mat-progress-bar>
+      <div class="table-container div-margin-10px">
+        <table class="table-margin-10px" mat-table [dataSource]="citiesModel.cityModelList">
+
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef> ID </th>
+            <td mat-cell *matCellDef="let element"> {{element.id}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef> Name </th>
+            <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="imageUrl">
+            <th mat-header-cell *matHeaderCellDef> Image</th>
+            <td mat-cell *matCellDef="let element"> <img [src]="element.imageUrl" [alt]="element.name" width="100"
+                class="shadow-4" /> </td>
+          </ng-container>
+
+          <ng-container matColumnDef="action">
+            <tr>
+              <th mat-header-cell *matHeaderCellDef> Action </th>
+            </tr>
+            <tr>
+              <td mat-cell *matCellDef="let row" style="width:20%">
+                <button mat-icon-button color="primary" (click)="editCity(row)" data-bs-toggle="modal"
+                  data-bs-target="#cityUpdateModal" title="Edit City">
+                  <mat-icon>Edit</mat-icon>
+                </button>
+              </td>
+            <tr>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
+
+      <mat-paginator *ngIf="!searchedCity" #paginator [length]="citiesModel.paginationModel.totalRecords"
+        [pageIndex]="citiesModel.paginationModel.pageNumber" [pageSize]="citiesModel.paginationModel.pageSize"
+        [pageSizeOptions]="pageSizeOptions" (page)="pageChanged($event)" aria-label="Select page">
+      </mat-paginator>
+
+    </div>
+  </div>
+
+
+
+
+
+  <!-- Button trigger modal -->
+  <button id="updatemodalbtn" type="button" class="btn btn-primary" data-bs-toggle="modal" hidden="true"
+    data-bs-target="#cityUpdateModal">
+  </button>
+
+
+  <!-- Modal -->
+  <div class="modal fade in" id="cityUpdateModal" tabindex="-1" role="dialog" aria-labelledby="cityUpdateModalTitle"
+    aria-hidden="true">
+    <form [formGroup]="cityForm" (ngSubmit)="onSubmit()">
+      <div class="modal-dialog modal-dialog-centered modal-content-width" role="document">
+        <div class="modal-content ">
+          <div class="modal-header">
+            <h5 class="modal-title" id="cityUpdateModalTitle">City Details</h5>
+            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" (click)="modalClose()">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body modal-body-content">
+
+            <div class="row div-margin-except-bottom">
+              <div class="col-xs-5 col-sm-5 col-md-5 lbl-bold">
+                City Name
+              </div>
+              <div class="col-xs-6 col-sm-6 col-md-6 no-div-left-margin">
+                <input type="text" id="name" name="name" formControlName="name" class="form-control">
+                <div
+                  *ngIf="cityForm.controls['name'].invalid && (cityForm.controls['name'].dirty || cityForm.controls['name'].touched)"
+                  class="alert alert-danger">
+                  Please enter city name
+                </div>
+              </div>
+            </div>
+
+            <div class="row div-margin-except-bottom">
+              <div class="col-xs-5 col-sm-5 col-md-5 lbl-bold">
+                Image URL
+              </div>
+              <div class="col-xs-6 col-sm-6 col-md-6 no-div-left-margin">
+                <input type="text" id="imageUrl" name="imageUrl" formControlName="imageUrl" class="form-control">
+                <div *ngIf="cityForm.controls['imageUrl'].touched && cityForm.controls['imageUrl'].invalid"
+                  class="alert alert-danger">
+                  Please provide valid url
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+              (click)="modalClose()">Close</button>
+            <button type="submit" class="btn btn-success" [disabled]="cityForm.invalid">Update</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+
+</div>
